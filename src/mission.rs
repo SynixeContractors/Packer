@@ -33,27 +33,38 @@ pub fn read_mission(source: &Path, dir: &str, id: String) -> Mission {
         // Read briefing.sqf
         let briefing_sqf = std::fs::read_to_string(&path).unwrap();
 
-        format!(
-            "**{}**\n\n**Employer**{}\n\n**Situation**{}\n\n**Mission**{}",
-            name,
-            REGEX_BRIEF_EMPLOYER
-                .captures(&briefing_sqf)
-                .unwrap()
-                .get(1)
-                .unwrap()
-                .as_str(),
-            REGEX_BRIEF_SITUATION
-                .captures(&briefing_sqf)
-                .unwrap()
-                .get(1)
-                .unwrap()
-                .as_str(),
-            REGEX_BRIEF_MISSION
-                .captures(&briefing_sqf)
-                .unwrap()
-                .get(1)
-                .unwrap()
-                .as_str(),
+        REGEX_BRIEF_EMPLOYER.captures(&briefing_sqf).map_or_else(
+            || {
+                format!(
+                    "**{}**\n\n**Mission**{}",
+                    name,
+                    REGEX_BRIEF_MISSION
+                        .captures(&briefing_sqf)
+                        .unwrap()
+                        .get(1)
+                        .unwrap()
+                        .as_str(),
+                )
+            },
+            |employer| {
+                format!(
+                    "**{}**\n\n**Employer**{}\n\n**Situation**{}\n\n**Mission**{}",
+                    name,
+                    employer.get(1).unwrap().as_str(),
+                    REGEX_BRIEF_SITUATION
+                        .captures(&briefing_sqf)
+                        .unwrap()
+                        .get(1)
+                        .unwrap()
+                        .as_str(),
+                    REGEX_BRIEF_MISSION
+                        .captures(&briefing_sqf)
+                        .unwrap()
+                        .get(1)
+                        .unwrap()
+                        .as_str(),
+                )
+            },
         )
     } else {
         String::new()
