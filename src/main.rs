@@ -76,6 +76,9 @@ fn main() {
 
     println!("Standalone");
     for directory in DIRECTORIES {
+        if !source.join(directory).exists() {
+            continue;
+        }
         println!(" {}", directory);
         let scenarios = read_scenarios(source.join(directory));
         if scenarios.is_empty() {
