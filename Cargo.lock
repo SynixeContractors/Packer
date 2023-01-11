@@ -40,7 +40,7 @@ dependencies = [
 [[package]]
 name = "bootstrap"
 version = "0.1.0"
-source = "git+https://github.com/SynixeContractors/Crate#31bb17315bf7b9a225d52708cf201a750b718a83"
+source = "git+https://github.com/SynixeContractors/Crate#177c256d67b21187a21a502502c9023f59a85712"
 dependencies = [
  "tracing-subscriber",
 ]
@@ -225,7 +225,7 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 
 [[package]]
 name = "packer"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "hemtt-pbo",
  "lazy_static",
@@ -362,7 +362,7 @@ dependencies = [
 [[package]]
 name = "synixe-model"
 version = "0.1.0"
-source = "git+https://github.com/SynixeContractors/Crate#31bb17315bf7b9a225d52708cf201a750b718a83"
+source = "git+https://github.com/SynixeContractors/Crate#177c256d67b21187a21a502502c9023f59a85712"
 dependencies = [
  "bootstrap",
  "regex",
