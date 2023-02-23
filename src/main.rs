@@ -13,7 +13,8 @@ use crate::mission::read_mission;
 
 mod mission;
 
-const DIRECTORIES: [&str; 4] = ["company", "contracts", "specials", "theatres"];
+const DIRECTORIES: [&str; 3] = ["company", "contracts", "specials"];
+const NESTED_DIRECTORIES: [&str; 2] = ["campaigns", "theatres"];
 
 fn main() {
     let source = PathBuf::from(std::env::args().nth(1).expect("no source given"));
@@ -126,6 +127,75 @@ fn main() {
             )
             .unwrap();
             missions.push(read_mission(&source, directory, scenario));
+        }
+    }
+
+    println!("Nested");
+    for directory in NESTED_DIRECTORIES {
+        if !source.join(directory).exists() {
+            continue;
+        }
+        for subdirectory in std::fs::read_dir(source.join(directory)).unwrap() {
+            let subdirectory = subdirectory.unwrap().path();
+            if !subdirectory.is_dir() {
+                continue;
+            }
+            let subdirectory = subdirectory.file_name().unwrap().to_str().unwrap();
+            println!(" {} {}", directory, subdirectory);
+            let scenarios = read_scenarios(source.join(format!("{}/{}", directory, subdirectory)));
+            if scenarios.is_empty() {
+                println!("  No scenarios found");
+                continue;
+            }
+            for scenario in scenarios {
+                println!("  {}", scenario);
+                let mut pbo = hemtt_pbo::WritablePbo::<File>::new();
+                for entry in WalkDir::new(
+                    source.join(format!("{}/{}/{}", directory, subdirectory, scenario)),
+                ) {
+                    let entry = entry.unwrap();
+                    if !entry.path().is_file() {
+                        continue;
+                    }
+                    if ["readme.md", "readme.txt"].contains(
+                        &entry
+                            .path()
+                            .file_name()
+                            .unwrap()
+                            .to_str()
+                            .unwrap()
+                            .to_lowercase()
+                            .as_str(),
+                    ) {
+                        continue;
+                    }
+                    let pbo_path = entry
+                        .path()
+                        .display()
+                        .to_string()
+                        .trim_start_matches(source.display().to_string().as_str())
+                        .trim_start_matches(&format!(
+                            "{}/{}/{}{}",
+                            directory,
+                            subdirectory,
+                            scenario,
+                            std::path::MAIN_SEPARATOR
+                        ))
+                        .to_string();
+                    pbo.add_file(pbo_path, File::open(entry.path()).unwrap())
+                        .unwrap();
+                }
+                pbo.write(
+                    &mut File::create(dest.join(format!("{}.pbo", scenario))).unwrap(),
+                    false,
+                )
+                .unwrap();
+                missions.push(read_mission(
+                    &source.join(directory),
+                    subdirectory,
+                    scenario,
+                ));
+            }
         }
     }
 
