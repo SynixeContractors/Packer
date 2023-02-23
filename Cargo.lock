@@ -77,7 +77,7 @@ dependencies = [
 [[package]]
 name = "bootstrap"
 version = "0.1.0"
-source = "git+https://github.com/SynixeContractors/Crate#332b4920a1cc5d4e47d68fe74b15cc78a06c2f30"
+source = "git+https://github.com/SynixeContractors/Crate#2c607df7a901f7a3788542115d61b805fed31496"
 dependencies = [
  "tracing-subscriber",
 ]
@@ -678,7 +678,7 @@ dependencies = [
 [[package]]
 name = "synixe-model"
 version = "0.1.0"
-source = "git+https://github.com/SynixeContractors/Crate#332b4920a1cc5d4e47d68fe74b15cc78a06c2f30"
+source = "git+https://github.com/SynixeContractors/Crate#2c607df7a901f7a3788542115d61b805fed31496"
 dependencies = [
  "bootstrap",
  "regex",
