@@ -12,6 +12,8 @@ use walkdir::WalkDir;
 use crate::mission::read_mission;
 
 mod mission;
+mod version_2;
+mod version_3;
 
 const DIRECTORIES: [&str; 3] = ["company", "contracts", "specials"];
 const NESTED_DIRECTORIES: [&str; 2] = ["campaigns", "theatres"];

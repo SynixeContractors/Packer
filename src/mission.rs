@@ -4,91 +4,24 @@ use regex::Regex;
 use synixe_model::missions::Mission;
 
 lazy_static::lazy_static! {
-    static ref REGEX_NAME: Regex = Regex::new(r#"(?m)OnLoadName = "(.+?)";"#).unwrap();
-    static ref REGEX_SUMMARY: Regex = Regex::new(r#"(?m)OnLoadMission = "(.+?)";"#).unwrap();
-    static ref REGEX_TYPE: Regex = Regex::new(r"(?m)synixe_type = (\d);").unwrap();
-
-    static ref REGEX_BRIEF_EMPLOYER: Regex = Regex::new(r#"(?ms)Employer", "(.+?)"]];"#).unwrap();
-    static ref REGEX_BRIEF_SITUATION: Regex = Regex::new(r#"(?ms)Situation", "(.+?)"]];"#).unwrap();
-    static ref REGEX_BRIEF_MISSION: Regex = Regex::new(r#"(?ms)Mission", "(.+?)"]];"#).unwrap();
+    static ref REGEX_VERSION: Regex = Regex::new(r"(?m)synixe_template = (\d+?);").unwrap();
 }
 
 pub fn read_mission(source: &Path, dir: &str, id: String) -> Mission {
-    // Read description.ext
     let description_ext =
-        std::fs::read_to_string(source.join(format!("{}/{}/edit_me/description.ext", dir, id)))
+        std::fs::read_to_string(source.join(format!("{}/{}/do_not_edit/description.ext", dir, id)))
             .unwrap();
 
-    let name = REGEX_NAME
-        .captures(&description_ext)
-        .unwrap()
-        .get(1)
-        .unwrap()
-        .as_str()
-        .to_string();
-
-    let path = source.join(format!("{}/{}/edit_me/briefing.sqf", dir, id));
-
-    let briefing = if path.exists() {
-        // Read briefing.sqf
-        let briefing_sqf = std::fs::read_to_string(&path).unwrap();
-
-        REGEX_BRIEF_EMPLOYER.captures(&briefing_sqf).map_or_else(
-            || {
-                format!(
-                    "**{}**\n\n**Mission**{}",
-                    name,
-                    REGEX_BRIEF_MISSION
-                        .captures(&briefing_sqf)
-                        .unwrap()
-                        .get(1)
-                        .unwrap()
-                        .as_str(),
-                )
-            },
-            |employer| {
-                format!(
-                    "**{}**\n\n**Employer**{}\n\n**Situation**{}\n\n**Mission**{}",
-                    name,
-                    employer.get(1).unwrap().as_str(),
-                    REGEX_BRIEF_SITUATION
-                        .captures(&briefing_sqf)
-                        .unwrap()
-                        .get(1)
-                        .unwrap()
-                        .as_str(),
-                    REGEX_BRIEF_MISSION
-                        .captures(&briefing_sqf)
-                        .unwrap()
-                        .get(1)
-                        .unwrap()
-                        .as_str(),
-                )
-            },
-        )
-    } else {
-        String::new()
+    let version = {
+        let version = REGEX_VERSION
+            .captures(&description_ext)
+            .map(|c| c.get(1).expect("always in capture").as_str());
+        version.map_or("2", |version| version)
     };
 
-    Mission {
-        id,
-        name,
-        summary: REGEX_SUMMARY
-            .captures(&description_ext)
-            .unwrap()
-            .get(1)
-            .unwrap()
-            .as_str()
-            .to_string(),
-        description: briefing,
-        typ: REGEX_TYPE
-            .captures(&description_ext)
-            .unwrap()
-            .get(1)
-            .unwrap()
-            .as_str()
-            .parse::<i32>()
-            .unwrap()
-            .into(),
+    match version {
+        "2" => crate::version_2::parse_mission(source, dir, id),
+        "3" => crate::version_3::parse_mission(source, dir, id),
+        _ => panic!("Unknown version {}", version),
     }
 }

@@ -1,6 +1,5 @@
-use assert_cmd::prelude::*; // Add methods on commands
-                            // use predicates::prelude::*; // Used for writing assertions
-use std::process::Command; // Run programs
+use assert_cmd::prelude::*;
+use std::process::Command;
 
 #[test]
 fn build() -> Result<(), Box<dyn std::error::Error>> {
