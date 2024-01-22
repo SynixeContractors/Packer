@@ -151,6 +151,10 @@ fn main() {
             }
             for scenario in scenarios {
                 println!("  {}", scenario);
+                if scenario.starts_with("TT") {
+                    println!("   Skipping theatre template (TT)");
+                    continue;
+                }
                 let mut pbo = hemtt_pbo::WritablePbo::<File>::new();
                 for entry in WalkDir::new(
                     source.join(format!("{}/{}/{}", directory, subdirectory, scenario)),

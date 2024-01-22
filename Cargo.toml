@@ -6,11 +6,11 @@ edition = "2021"
 [dependencies]
 hemtt-pbo = { git = "https://github.com/BrettMayson/HEMTT" }
 lazy_static = "1.4.0"
-regex = "1.9.3"
-serde_json = "1.0.104"
+regex = "1.10.3"
+serde_json = "1.0.111"
 synixe-model = { git = "https://github.com/SynixeContractors/Crate", default-features = false, features = ["missions"] }
-walkdir = "2.3.3"
+walkdir = "2.4.0"
 
 [dev-dependencies]
-assert_cmd = "2.0.8"
-predicates = "3.0.3"
+assert_cmd = "2.0.13"
+predicates = "3.1.0"
